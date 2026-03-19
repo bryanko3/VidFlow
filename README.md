@@ -111,7 +111,7 @@ python app.py
 - Password hashing for user safety  
 
 ### Video Engine
-- Upload and store contents via **HLS (HTTP Live Streaming)**  
+- Upload and store contents via **HLS**  
 - Apply watermark to uploaded videos  
 
 ### Social Interaction
