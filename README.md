@@ -152,7 +152,7 @@ It showcases scalability, feature depth, and hands-on media engineering experien
 ## Usage Restrictions
 
 - **Non-commercial use only**
-- **Commercial use requires prior contact**: dongyeon@example.com
+- **Commercial use requires prior contact**: dongyek4@uci.edu
 
 ---
 
