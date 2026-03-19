@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="profile-header">
+
+{% if user.profile_image %}
+<img src="/profiles/{{user.profile_image}}" class="profile-img">
+{% else %}
+<img src="/static/default_profile.png" class="profile-img">
+{% endif %}
+
+<h2>{{user.username}}</h2>
+
+<p>
+❤️ {{total_likes}} Like(s)
+|
+👥 {{subscribers}} Subscriber(s)
+</p>
+
+{% if session.get("user") == user.id %}
+
+<div class="profile-status">
+
+<b>Profile Status</b>
+
+<form method="post" action="/profile/update_status">
+
+<label class="toggle">
+<input type="radio" name="status" value="public"
+{% if user.profile_status == "public" %}checked{% endif %}>
+<span>Public</span>
+</label>
+
+<label class="toggle">
+<input type="radio" name="status" value="private"
+{% if user.profile_status == "private" %}checked{% endif %}>
+<span>Private</span>
+</label>
+
+<button class="btn-small">Update</button>
+
+</form>
+
+</div>
+
+<form method="post" action="/profile/update_image" enctype="multipart/form-data" class="bio-form">
+
+<div class="upload-guide">
+<strong>Change your profile picture in 2 steps!</strong>
+<ul>Click <b>Choose File</b> → Click <b>Change Photo</b></ul>
+</div>
+
+<input type="file" name="profile_image" accept="image/*">
+
+<button type="submit">Change Photo</button>
+
+
+
+</form>
+
+{% if user.profile_image %}
+<form method="post" action="/profile/delete_image">
+<button class="delete-btn">Remove Photo</button>
+</form>
+{% endif %}
+
+<form method="post" action="/profile/update_bio" class="bio-form">
+<textarea name="bio" rows="3" placeholder="Add your bio...">{{user.bio or ''}}</textarea>
+<button type="submit">Save your bio</button>
+</form>
+
+{% else %}
+
+<p class="bio">{{user.bio or "No bio yet"}}</p>
+
+{% endif %}
+
+</div>
+
+<div class="video-sort">
+    <a href="?sort=latest">Latest</a>
+    <a href="?sort=views">Most Viewed</a>
+    <a href="?sort=oldest">Oldest</a>
+</div>
+
+<h2>My Videos</h2>
+
+<div class="video-grid">
+
+{% for video in videos %}
+
+<div class="video-card">
+
+<a href="/watch/{{video.id}}">
+    <div class="video-frame-a" style="position: relative; overflow: hidden;">
+
+        {% if video.thumbnail %}
+        <img src="/thumbs/{{video.thumbnail}}" class="video-thumb" style="width:100%; height: 100%; display:block;">
+        {% else %}
+
+        <video src="/stream/{{video.id}}" muted style="width:100%; height: 100%; display:block;"></video>
+        {% endif %}
+
+        <video
+            src="/stream/{{video.id}}"
+            muted
+            loop
+            class="hover-preview"
+        ></video>
+
+    </div>
+<div class="video-info">
+<p class="video-title">{{video.title}}</p>
+<p class="video-views">Views: {{video.views}}</p>
+<p Class="video-likes">Likes: {{video.likes}}</p>
+<p class="video-category">
+Category: {{video.category}}
+</p>
+
+</a>
+
+{% if video.description %}
+<p class="video-description">{{video.description}}</p>
+{% endif %}
+</div>
+{% if session.get("user") == user.id %}
+<form action="/delete/{{video.id}}" method="post">
+<button class="delete-btn">Delete</button>
+</form>
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% if liked_videos %}
+<h2>Liked Videos</h2>
+
+<div class="video-grid">
+
+{% for video in liked_videos %}
+
+<div class="video-card">
+
+<a href="/watch/{{video.id}}">
+    <div class="video-frame-a" style="position: relative; overflow: hidden;">
+
+        {% if video.thumbnail %}
+        <img src="/thumbs/{{video.thumbnail}}" class="video-thumb" style="width:100%; height: 100%; display:block;">
+        {% else %}
+
+        <video src="/stream/{{video.id}}" muted style="width:100%; height: 100%; display:block;"></video>
+        {% endif %}
+
+        <video
+            src="/stream/{{video.id}}"
+            muted
+            loop
+            class="hover-preview"
+        ></video>
+
+    </div>
+
+    <div class="video-info">
+        <p class="video-title">{{video.title}}</p>
+        <p class="video-views">Views: {{video.views}}</p>
+        <p class="video-likes">Likes: {{video.likes}}</p>
+        <p class="video-category">Category: {{video.category}}</p>
+</a>
+    </div>
+
+
+</div>
+
+{% endfor %}
+
+</div>
+{% endif %}
+
+{% if subscribed_channels %}
+<h2>Subscribed Channels</h2>
+
+<div class="video-grid">
+
+{% for ch in subscribed_channels %}
+
+<div class="video-card channel-card">
+
+<a href="/channel/{{ch.id}}" class="channel-link"></a>
+
+{% if ch.profile_image %}
+<img src="/profiles/{{ch.profile_image}}" class="channel-avatar">
+{% else %}
+<img src="/static/default_profile.png" class="channel-avatar">
+{% endif %}
+
+<h3>{{ch.username}}</h3>
+<p>👥 {{ch.subscribers}} subscriber(s)</p>
+<p>❤️ {{ch.total_likes}} like(s)</p>
+
+{% if ch.bio %}
+<p class="channel-bio">{{ch.bio}}</p>
+{% endif %}
+
+{% if session.get("user") == ch.id %}
+<form action="/unsubscribe/{{ch.id}}" method="post">
+<button class="delete-btn">Unsubscribe</button>
+</form>
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+</div>
+{% endif %}
+
+{% endblock %}

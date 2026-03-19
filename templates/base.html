@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>VidFlow</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header>
+
+<div class="header-left">
+<a href="/">Home</a>
+<a href="/upload">Upload</a>
+</div>
+
+<div class="header-center">
+
+<form action="/" method="get" id="search-form">
+
+<input name="q" placeholder="Search videos" value="{{ request.args.get('q','') }}">
+
+<input type="hidden" name="categories" id="search-categories" value="{{ request.args.get('categories','') }}">
+
+<button type="submit">Search</button>
+<button type="button" id="filter-btn">Filter</button>
+
+</form>
+
+</div>
+
+<div class="header-right">
+
+{% if session.get("user") %}
+
+<a class="btn" href="/profile">Profile</a>
+<a class="btn logout" href="/logout">Logout</a>
+
+{% else %}
+
+<a class="btn" href="/login">Login</a>
+<a class="btn register" href="/register">Register</a>
+
+{% endif %}
+
+</div>
+
+</header>
+
+<div id="filter-overlay" class="filter-overlay"></div>
+
+<main>
+{% block content %}{% endblock %}
+</main>
+
+<div id="filter-popup" class="filter-popup">
+
+<h3>Select Categories</h3>
+
+<p>
+Click <b>"Apply"</b> to find your contents
+</p>
+
+<form id="filter-form">
+
+{% for cat in categories %}
+
+<label>
+<input type="checkbox" value="{{cat.id}}">
+{{cat.name}}
+</label>
+
+{% endfor %}
+
+<button type="button" id="confirm-filter">Apply</button>
+
+</form>
+
+</div>
+
+<script src="/static/js/main.js"></script>
+{% block extra_js %}{% endblock %}
+
+<script>
+
+const btn = document.getElementById("filter-btn")
+const popup = document.getElementById("filter-popup")
+const overlay = document.getElementById("filter-overlay")
+
+btn.onclick = function(){
+
+popup.classList.add("show")
+overlay.classList.add("show")
+
+}
+
+overlay.onclick = function(){
+
+popup.classList.remove("show")
+overlay.classList.remove("show")
+
+}
+
+document.addEventListener("keydown", function(e){
+
+if(e.key === "Escape"){
+popup.classList.remove("show")
+overlay.classList.remove("show")
+}
+
+})
+
+document.getElementById("confirm-filter").onclick = function () {
+
+const checks = document.querySelectorAll("#filter-form input:checked")
+const selected = Array.from(checks).map(c => c.value).join(",")
+
+const btn = document.getElementById("filter-btn")
+const hiddenInput = document.getElementById("search-categories")
+
+if(selected.length > 0){
+
+hiddenInput.value = selected
+btn.innerText = "Filter ✔"
+
+}else{
+
+hiddenInput.value = ""
+btn.innerText = "Filter"
+
+}
+
+document.getElementById("search-form").submit()
+
+popup.classList.remove("show")
+overlay.classList.remove("show")
+
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+
+const selectedCategories = (document.getElementById("search-categories").value || "").split(",")
+
+const checks = document.querySelectorAll("#filter-form input")
+
+checks.forEach(c => {
+
+if(selectedCategories.includes(c.value)){
+c.checked = true
+}
+
+})
+
+const btn = document.getElementById("filter-btn")
+
+if(selectedCategories.length > 0 && selectedCategories[0] !== ""){
+btn.innerText = "Filter ✔"
+}
+
+})
+
+</script>
+
+</body>
+</html>

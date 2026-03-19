@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="profile-header">
+
+{% if user.profile_image %}
+<img src="/profiles/{{user.profile_image}}" class="profile-img">
+{% else %}
+<img src="/static/default_profile.png" class="profile-img">
+{% endif %}
+
+<h2>{{user.username}}</h2>
+
+<p>
+❤️ {{total_likes}} Like(s)
+|
+👥 <span id="subscriber-count">{{subscribers}}</span> Subscriber(s)
+</p>
+
+{% if user.bio %}
+<p class="bio">{{user.bio}}</p>
+{% else %}
+<p class="bio">No bio yet</p>
+{% endif %}
+
+{% if session.get("user") != user.id %}
+
+<button
+id="subscribe-btn"
+class="btn"
+data-channel="{{user.id}}"
+>
+
+{% if subscribed %}
+Unsubscribe ✔
+{% else %}
+Subscribe
+{% endif %}
+
+</button>
+
+{% endif %}
+
+</div>
+
+
+<div class="video-sort">
+<a href="?sort=latest">Latest</a>
+<a href="?sort=views">Most Viewed</a>
+<a href="?sort=oldest">Oldest</a>
+</div>
+
+
+<h2>{{user.username}}'s Videos</h2>
+
+<div class="video-grid">
+
+{% for video in videos %}
+
+<div class="video-card">
+
+<a href="/watch/{{video.id}}">
+<div class="video-frame-a" style="position: relative; overflow: hidden;">
+
+{% if video.thumbnail %}
+<img src="/thumbs/{{video.thumbnail}}" alt="{{video.title}}" class="video-thumb" style="width:100%; height: 100%; display:block;">
+{% else %}
+<video src="/stream/{{video.id}}" muted style="width:100%; height: 100%; display:block;"></video>
+{% endif %}
+
+<video
+src="/stream/{{video.id}}"
+muted
+loop
+class="hover-preview"
+></video>
+
+</div>
+</a>
+
+<div class="video-info">
+
+<p class="video-title">{{video.title}}</p>
+
+<p class="video-views">
+Views: {{video.views}}
+</p>
+
+<p class="video-likes">
+Likes: {{video.likes}}
+</p>
+
+<p class="video-category">
+Category: {{video.category}}
+</p>
+
+{% if video.description %}
+<p class="video-description">{{video.description}}</p>
+{% endif %}
+
+</div>
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script>
+
+const subBtn = document.getElementById("subscribe-btn")
+const subCount = document.getElementById("subscriber-count")
+
+if(subBtn){
+
+subBtn.onclick = async function(){
+
+const channelId = subBtn.dataset.channel
+
+const res = await fetch(`/subscribe/${channelId}`)
+const data = await res.json()
+
+let count = parseInt(subCount.innerText)
+
+if(data.subscribed){
+
+subBtn.innerText = "Unsubscribe"
+
+count += 1
+subCount.innerText = count
+
+}else{
+
+subBtn.innerText = "Subscribe"
+
+count -= 1
+subCount.innerText = count
+
+}
+
+}
+
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="upload-container">
+
+<h2 class="upload-title">Upload Video</h2>
+
+<div class="upload-guide">
+<strong>Upload Tips</strong>
+<ul>
+<li>Recommended video resolution: <b>1080p</b></li>
+<li>Recommended video format: <b>MP4</b></li>
+<li>Recommended thumbnail aspect ratio: <b>4:3</b> (e.g., <b>640x480 pixels</b>)</li>
+<li><b>Maximum size</b> depends on server configuration</li>
+<li>Please wait at least <b>10 seconds</b> while the video is uploading, and do not click any buttons. (If you click another button right after pressing the upload button, the upload may be canceled.)</li>
+</ul>
+</div>
+
+<form method="post" enctype="multipart/form-data" class="upload-form" id="upload-form">
+
+<label for="title">Video Title</label>
+<input id="title" name="title" placeholder="Enter video title" required>
+
+<label>Category</label>
+
+<select name="category_id" id="category-select" required>
+
+<option value="">Select Category</option>
+
+{% for cat in categories %}
+<option value="{{cat.id}}">{{cat.name}}</option>
+{% endfor %}
+
+</select>
+
+<label for="description">Description (optional)</label>
+<textarea id="description" name="description" rows="5" placeholder="Tell viewers about your video..."></textarea>
+
+<label for="video">Select Video File</label>
+<input id="video" type="file" name="video" accept="video/*" required>
+
+<label for="thumbnail">Customize Thumbnail (optional)</label>
+<input id="thumbnail" type="file" name="thumbnail" accept="image/png, image/jpeg">
+
+<div id="thumb-preview" style="display:none;margin-top:10px;">
+<img id="thumb-img" style="max-width:250px;border-radius:6px;">
+</div>
+
+<div id="video-preview" class="video-preview" style="display:none;">
+<video id="preview-player" controls></video>
+</div>
+
+<button type="submit" class="upload-btn">Upload Video</button>
+
+</form>
+
+</div>
+
+<script>
+
+const form=document.getElementById("upload-form")
+const videoInput=document.getElementById("video")
+const preview=document.getElementById("video-preview")
+const player=document.getElementById("preview-player")
+
+form.addEventListener("submit",function(e){
+
+const cat=document.getElementById("category-select").value
+
+if(!cat){
+alert("Please select a category")
+e.preventDefault()
+return
+}
+
+const btn=document.querySelector(".upload-btn")
+btn.innerText="Uploading in progress..."
+btn.disabled=true
+
+})
+
+videoInput.addEventListener("change",function(){
+
+const file=this.files[0]
+
+if(!file) return
+
+const url=URL.createObjectURL(file)
+
+player.src=url
+preview.style.display="block"
+
+})
+
+const thumbInput=document.getElementById("thumbnail")
+const thumbPreview=document.getElementById("thumb-preview")
+const thumbImg=document.getElementById("thumb-img")
+
+thumbInput.addEventListener("change",function(){
+
+const file=this.files[0]
+if(!file) return
+
+const url=URL.createObjectURL(file)
+
+thumbImg.src=url
+thumbPreview.style.display="block"
+
+})
+
+</script>
+
+{% endblock %}

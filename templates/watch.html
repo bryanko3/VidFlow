@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="watch-container">
+
+<div class="watch-left">
+
+<h2 class="video-title">{{video.title}}</h2>
+
+<div class="video-player">
+<video
+id="player"
+controls
+controlsList="nodownload noplaybackrate"
+disablepictureinpicture
+playsinline
+oncontextmenu="return false;"
+></video>
+</div>
+
+</div>
+
+<div class="watch-right">
+
+<div class="channel-card-b">
+
+{% if uploader.profile_image %}
+<img src="/profiles/{{uploader.profile_image}}" class="channel-avatar">
+{% else %}
+<img src="/static/default_profile.png" class="channel-avatar">
+{% endif %}
+
+<div class="channel-info">
+
+<h3>
+
+{% if uploader.profile_status == "public" %}
+
+<a href="/channel/{{uploader.id}}">
+{{uploader.username}}
+</a>
+
+{% else %}
+
+<span class="private-user">
+{{uploader.username}}
+</span>
+
+{% endif %}
+
+</h3>
+
+{% if uploader.bio %}
+<p class="channel-bio">{{uploader.bio}}</p>
+{% endif %}
+
+</div>
+
+</div>
+
+<div class="video-meta-card">
+
+<p class="meta-item">Views: {{video.views}}</p>
+<p id="like-count" class="meta-item">Likes: {{ get_like_count(video.id) }}</p>
+<p class="meta-item">Category: {{video.category}}</p>
+
+<button
+id="like-btn"
+data-video="{{video.id}}"
+class="like-btn {% if user_liked(video.id, session.get('user',0)) %}liked{% endif %}">
+
+{% if user_liked(video.id, session.get('user',0)) %}
+❤️ Liked
+{% else %}
+🤍 Like
+{% endif %}
+
+</button>
+
+</div>
+
+{% if video.description %}
+<h class="description">Description</h>
+<div class="video-description-b">
+<p>{{ video.description }}</p>
+</div>
+{% endif %}
+
+<div class="comments-section">
+
+<h3 class="comment-title">Comments ({{comments|length}})</h3>
+
+<form method="post"
+action="/comment/{{video.id}}"
+id="comment-form"
+class="comment-input-box">
+
+<div class="comment-avatar">
+{% if session.get("profile_image") %}
+<img src="/profiles/{{session.get('profile_image')}}">
+{% else %}
+<img src="/static/default_profile.png">
+{% endif %}
+</div>
+
+<input
+id="comment-input"
+name="text"
+placeholder="Write a comment..."
+required>
+
+<button>Post</button>
+
+</form>
+
+<div class="comments-list">
+
+{% for comment in comments %}
+
+<div class="comment-card">
+
+<div class="comment-avatar">
+{% if comment.profile_image %}
+<img src="/profiles/{{comment.profile_image}}">
+{% else %}
+<img src="/static/default_profile.png">
+{% endif %}
+</div>
+
+<div class="comment-content">
+
+<p class="comment-user">
+
+{% if comment.profile_status == "public" %}
+
+<a href="/channel/{{comment.user_id}}">
+{{comment.username}}
+</a>
+
+{% else %}
+
+<span class="private-user">
+{{comment.username}}
+</span>
+
+{% endif %}
+
+</p>
+
+<p class="comment-text">
+{{comment.text}}
+</p>
+
+{% if session.get("user") == comment.user_id %}
+<a class="comment-delete"
+href="/comment/delete/{{comment.id}}/{{video.id}}">
+Delete
+</a>
+{% endif %}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+<div class="more-videos">
+
+<h4 class="side-title">More contents from {{uploader.username}}</h4>
+
+<div class="side-video-list">
+
+{% for v in uploader_videos %}
+
+<a href="/watch/{{v.id}}" class="side-video">
+  <div class="side-thumb" style="position: relative; overflow: hidden;">
+
+    {% if v.thumbnail %}
+      <img src="/thumbs/{{v.thumbnail}}" alt="{{v.title}}" class="video-thumb" style="width:100%; height: 100%; display:block;">
+    {% else %}
+      <video src="/stream/{{v.id}}" muted style="width:100%; height: 100%; display:block;"></video>
+    {% endif %}
+
+    <video
+      src="/stream/{{v.id}}"
+      muted
+      loop
+      class="hover-preview"
+      style="position:absolute; top:0; left:0; width:100%; height:100%; display:none; object-fit:cover;">
+    </video>
+
+  </div>
+
+  <div class="side-info">
+    <p class="side-title-small">{{v.title}}</p>
+  </div>
+</a>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+const video = document.getElementById("player")
+const filename = "{{video.filename}}"
+const hlsUrl = `/hls/{{video.user_id}}_${filename}/playlist.m3u8`
+
+if (Hls.isSupported()) {
+    const hls = new Hls()
+    hls.loadSource(hlsUrl)
+    hls.attachMedia(video)
+}else{
+    video.src = hlsUrl
+}
+
+const likeBtn = document.querySelector("#like-btn")
+const likeCount = document.querySelector("#like-count")
+
+likeBtn.addEventListener("click", function(){
+    const videoId = this.dataset.video
+    fetch("/like/" + videoId,{method:"POST"})
+    .then(res=>res.json())
+    .then(data=>{
+        likeCount.textContent="Likes: "+data.likes
+        if(data.liked){
+            likeBtn.textContent="❤️ Liked"
+            likeBtn.classList.add("liked")
+        }else{
+            likeBtn.textContent="🤍 Like"
+            likeBtn.classList.remove("liked")
+        }
+    })
+})
+
+})
+
+</script>
+
+{% endblock %}

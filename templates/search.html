@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Search : {{q}}</h2>
+
+{% for v in videos %}
+
+<a href="/watch/{{v.id}}">
+
+<p>{{v.title}}</p>
+
+</a>
+
+{% endfor %}
+
+{% endblock %}

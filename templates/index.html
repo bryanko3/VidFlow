@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Latest Videos</h2>
+
+<div class="video-grid">
+
+{% for v in videos %}
+<div class="video-card">
+
+    <a href="/watch/{{v.id}}">
+        <div class="video-frame-a" style="position: relative; overflow: hidden;">
+
+            {% if v.thumbnail %}
+            <img src="/thumbs/{{v.thumbnail}}" class="video-thumb" style="width:100%; height: 100%; display:block;">
+            {% else %}
+
+            <video src="/stream/{{v.id}}" muted style="width:100%; height: 100%; display:block;"></video>
+            {% endif %}
+
+            <video
+                src="/stream/{{v.id}}"
+                muted
+                loop
+                class="hover-preview"
+            ></video>
+
+        </div>
+    </a>
+
+    <div class="video-info">
+        <p class="video-title">{{v.title}}</p>
+        <p class="video-username">👤 {{v.username}}</p>
+        <p class="video-stats">👁 {{v.views}} &nbsp; | &nbsp; ❤️ {{v.likes}}</p>
+        <p class="video-category">Category: {{v.category}}</p>
+
+        {% if v.description %}
+        <p class="video-description">{{v.description}}</p>
+        {% endif %}
+    </div>
+
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}

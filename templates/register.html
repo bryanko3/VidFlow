@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2 style="text-align:center">Register</h2>
+
+<form method="post" enctype="multipart/form-data" class="upload-form">
+
+    {% if error %}
+    <div class="form-error">
+        {{error}}
+    </div>
+    {% endif %}
+
+    <label for="username">Username</label>
+    <input
+        id="username"
+        name="username"
+        type="text"
+        placeholder="Choose a username"
+        required
+    >
+
+    <label for="password">Password</label>
+    <input
+        id="password"
+        name="password"
+        type="password"
+        placeholder="Create a password"
+        required
+    >
+
+    <label for="confirm">Confirm Password</label>
+    <input
+        id="confirm"
+        name="confirm"
+        type="password"
+        placeholder="Confirm your password"
+        required
+    >
+
+    <label for="profile_image">Profile Image</label>
+    <input
+        id="profile_image"
+        type="file"
+        name="profile_image"
+        accept="image/*"
+    >
+
+    <button type="submit">Register</button>
+
+</form>
+
+<p style="text-align:center; margin-top:15px;">
+    Already have an account?
+    <a href="/login" class="btn">Login</a>
+</p>
+
+{% endblock %}
