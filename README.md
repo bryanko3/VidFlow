@@ -147,6 +147,15 @@ python app.py
 VidFlow was created to simulate a **real-world content platform** and push the limits of full-stack web development.  
 It showcases scalability, feature depth, and hands-on media engineering experience.
 
+---
+
+## Usage Restrictions
+
+- **Non-commercial use only**
+- **Commercial use requires prior contact**: dongyeon@example.com
+
+---
+
 ## Contact
 
 Email: dongyek4@uci.edu
