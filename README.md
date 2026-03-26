@@ -99,7 +99,7 @@ VidFlow/
 
 ```bash
 git clone https://github.com/bryanko3/VidFlow-Video-Sharing-Web-Platform.git
-cd VidFlow
+cd VidFlow-Video-Sharing-Web-Platform
 pip install -r requirements.txt
 python app.py
 ```
